@@ -1,8 +1,7 @@
-use std::arch::x86_64::_MM_MANT_SIGN_ZERO;
-
 use rtd_fork::{Item, add_item, list_uncompleted};
 fn main() {
     println!("RTD Clone - Rust Todo CLI");
+    println!("Phase 4: file save && load.");
     println!();
 
     match add_item("learn Rust") {
@@ -10,7 +9,7 @@ fn main() {
         Err(e) => println!("Error: {}", e),
     }
 
-    match add_item("finished phase 3.") {
+    match add_item("finished phase 4.") {
         Ok(msg) => println!("{}", msg),
         Err(e) => println!("Error: {}", e),
     }
