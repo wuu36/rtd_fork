@@ -1,5 +1,5 @@
 use clap::{Parser, ValueEnum};
-use rtd_fork::{add_item, complete_item, delete_item, list_all, list_completed, list_deleted, list_uncompleted, restore_item, uncomplete_item};
+use rtd_fork::{add_item, clear, complete_item, delete_item, destory_deleted, destory_item, list_all, list_completed, list_deleted, list_uncompleted, restore_item, uncomplete_item};
 
 #[derive(ValueEnum, Clone, Debug)]
 enum ListType {
@@ -28,6 +28,15 @@ struct Args {
 
     #[arg(short, long, value_name = "ID")]
     restore: Option<u32>,
+
+    #[arg(long, value_name = "ID")]
+    destory: Option<u32>,
+
+    #[arg(long)]
+    destory_deleted: bool,
+
+    #[arg(long)]
+    clear: bool,
 
     #[arg(short, long, value_name = "TYPE")]
     list: Option<Option<ListType>>,
@@ -76,6 +85,29 @@ fn main() {
             Err(e) => eprintln!("error: {}", e),
         }
     } 
+
+    if let Some(id) = args.destory {
+        match destory_item(id) {
+            Ok(msg) => println!("{}", msg),
+            Err(e) => eprint!("error: {}", e),
+        }
+    }
+
+    if args.destory_deleted {
+        match destory_deleted() {
+            Ok(msg) => println!("{}", msg),
+            Err(e) => eprintln!("error: {}", e),
+        }
+        return;
+    }
+
+    if args.clear {
+        match clear() {
+            Ok(msg) => println!("{}", msg),
+            Err(e) => eprintln!("error: {}", e),
+        }
+        return;
+    }
 
     // 处理 list 命令 (默认列出未完成)
     let list_type = args.list.unwrap_or(Some(ListType::Uncompleted));

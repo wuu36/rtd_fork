@@ -120,20 +120,20 @@ pub fn update_item(updated: Item) -> Result<(), StorageError> {
     Ok(())
 }
 
-// 物理删除指定 ID 的 Item
-// pub fn delete_item(id: u32) -> Result<(), StorageError> {
-//     let items = get_all()?;
-//     let path = get_csv_path()?;
-//     let path = Path::new(&path);
+/// 物理删除指定 ID 的 Item
+pub fn delete_item(id: u32) -> Result<(), StorageError> {
+    let items = get_all()?;
+    let path = get_csv_path()?;
+    let path = Path::new(&path);
 
-//     // 重新写入，跳过被删除的 Item
-//     let mut file = File::create(path)?;
+    // 重新写入，跳过被删除的 Item
+    let mut file = File::create(path)?;
 
-//     for item in items {
-//         if item.id() != id {
-//             writeln!(file, "{}", item.to_string())?;
-//         }
-//     }
+    for item in items {
+        if item.id() != id {
+            writeln!(file, "{}", item.to_string())?;
+        }
+    }
 
-//     Ok(())
-// }
+    Ok(())
+}

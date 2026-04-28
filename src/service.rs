@@ -137,6 +137,46 @@ pub fn list_deleted() -> Result<String> {
     Ok(result)
 }
 
+pub fn destory_item(id: u32) -> Result<String> {
+    storage::delete_item(id)?;
+    Ok(format!("destory [{}]", id))
+}
+
+pub fn destory_deleted() -> Result<String> {
+    let items = storage::get_all()?;
+    let deleted_ids: Vec<u32> = items
+        .iter()
+        .filter(|item| item.is_deleted())
+        .map(|item| item.id())
+        .collect();
+
+    if deleted_ids.is_empty() {
+        return Ok("trash is empty, nothing to destory.".to_string());
+    }
+
+    let count = deleted_ids.len();
+    for id in &deleted_ids {
+        storage::delete_item(*id)?;
+    }
+
+    Ok(format!("destoryed {} items from trash.", count))
+}
+
+pub fn clear() -> Result<String> {
+    let items = storage::get_all()?;
+
+    if items.is_empty() {
+        return Ok("no items to clear.".to_string());
+    }
+
+    let count = items.len();
+    for item in items {
+        storage::delete_item(item.id())?;
+    }
+    
+    Ok(format!("cleared {} items.", count))
+}
+
 /// list all Todo
 pub fn list_all() -> Result<String> {
     let items = storage::get_all()?;
