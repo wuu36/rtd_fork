@@ -1,7 +1,6 @@
 use crate::model::Item;
 use std::io::Read;
 use std::io::Write;
-use std::ptr::read;
 use std::{env, fs::OpenOptions, path::Path};
 use std::fs::File;
 
@@ -94,12 +93,12 @@ pub fn get_max_id() -> Result<u32, StorageError> {
     Ok(max_id)
 }
 
-fn format_csv_line(item: &Item) -> String {
-    format!(
-        "{},{},{},{},0,0,0",
-        item.id(),
-        item.name(),
-        item.is_completed(),
-        item.is_deleted()
-    )
-}
+// fn format_csv_line(item: &Item) -> String {
+//     format!(
+//         "{},{},{},{},0,0,0",
+//         item.id(),
+//         item.name(),
+//         item.is_completed(),
+//         item.is_deleted()
+//     )
+// }
