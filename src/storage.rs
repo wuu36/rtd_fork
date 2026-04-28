@@ -1,6 +1,7 @@
 use crate::model::Item;
 use std::io::Read;
 use std::io::Write;
+use std::ptr::read;
 use std::{env, fs::OpenOptions, path::Path};
 use std::fs::File;
 
@@ -45,7 +46,8 @@ pub fn add_item(item: &Item) -> Result<(), StorageError> {
         .append(true)
         .open(path)?;
 
-    writeln!(file, "{}", format_csv_line(item))?;
+    // writeln!(file, "{}", format_csv_line(item))?;
+    writeln!(file, "{}", item.to_string())?;
 
     Ok(())
 }
@@ -63,6 +65,16 @@ pub fn read_all() -> Result<String, StorageError> {
     file.read_to_string(&mut content)?;
 
     Ok(content)
+}
+
+pub fn get_all() -> Result<Vec<Item>, StorageError> {
+    let content = read_all()?;
+    let items: Vec<Item> = content
+        .lines()
+        .filter_map(|line| line.parse::<Item>().ok())
+        .collect();
+
+    Ok(items)
 }
 
 pub fn get_max_id() -> Result<u32, StorageError> {

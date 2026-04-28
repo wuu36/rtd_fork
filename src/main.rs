@@ -1,4 +1,4 @@
-use rtd_fork::{Item, add_item, list_uncompleted};
+use rtd_fork::{Item, add_item, list_all, list_uncompleted};
 fn main() {
     println!("RTD Clone - Rust Todo CLI");
     println!("Phase 4: file save && load.");
@@ -21,7 +21,20 @@ fn main() {
         Err(e) => println!("Error: {}", e),
     }
 
-    let item = Item::new(99, "test item");
     println!();
-    println!("direct item: [{}] {}", item.id(), item.name());
+    
+    // ToString serilization
+    println!("Direct serialization demo:");
+    let item = Item::new(99, "test item");
+    println!(" Item.to_string(): {}", item.to_string());
+    println!(" Item ID: {}", item.id());
+    println!(" Item name: {}", item.name());
+
+    println!();
+
+    match list_all() {
+        Ok(list) => println!("{}", list),
+        Err(e) => println!("Error, {}", e),
+    }
+
 }
