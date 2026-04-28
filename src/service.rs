@@ -1,6 +1,8 @@
 
-use crate::model::{timestamp_to_datetime_string};
+use crate::model::timestamp_to_datetime_string;
 use crate::{Item, storage::{self, StorageError}};
+
+type Result<T> = std::result::Result<T, ServiceError>;
 
 #[derive(Debug)]
 pub enum ServiceError {
@@ -10,7 +12,7 @@ pub enum ServiceError {
 impl std::fmt::Display for ServiceError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            ServiceError::Storage(e) => write!(f, "storage error: {}", e),
+            ServiceError::Storage(e) => write!(f, "Service error: {}", e),
         }
     }
 }
@@ -22,11 +24,9 @@ impl From<StorageError> for ServiceError {
         ServiceError::Storage(e)
     }
 }
-    
-
 
 /// add new todo project
-pub fn add_item(name: &str) -> Result<String, ServiceError> {
+pub fn add_item(name: &str) -> Result<String> {
     let max_id = storage::get_max_id()?;
     let new_id = max_id + 1; 
 
@@ -36,7 +36,8 @@ pub fn add_item(name: &str) -> Result<String, ServiceError> {
     Ok(format!("added [{}]: {}", item.id(), item.name()))
 }
 
-pub fn list_uncompleted() -> Result<String, ServiceError> {
+/// list uncompleted items
+pub fn list_uncompleted() -> Result<String> {
     // let content = storage::read_all()?;
     let items = storage::get_all()?;
 
@@ -50,66 +51,99 @@ pub fn list_uncompleted() -> Result<String, ServiceError> {
         return Ok("no uncompleted item.".to_string());
     }
 
-    // if content.is_empty() {
-    //     return Ok("no items yet.".to_string());
-    // }
-
-    let mut output = String::new();
-    // output.push_str("Todo List:\n");
-    output.push_str("uncompleted Todo:\n");
-    
+    let mut result = "Uncompleted Todo:\n\n".to_string();
     for item in uncompleted {
-        let created = timestamp_to_datetime_string(item.created_at());
-        output.push_str(&format!(
-            "  [{}] {} (created: {})\n",
-            item.id(),
-            item.name(),
-            created
-        ));
+        result += &format_item(&item);
+        result += "\n";
     }
-
-    // for line in content.lines() {
-    //     if line.is_empty() {
-    //         continue;
-    //     }
-
-    //     let parts: Vec<&str> = line.split(',').collect();
-    //     if parts.len() >= 4 {
-    //         let id = parts[0].parse().unwrap_or(0);
-    //         let name = parts[1];
-    //         let completed = parts[2].parse().unwrap_or(false);
-    //         let deleted = parts[3].parse().unwrap_or(false);
-
-    //         if !completed && !deleted {
-    //             output.push_str(&format!(" [{}] {}\n", id, name));
-    //         }
-    //     }
-    // }
-    
-    Ok(output)
+    Ok(result)
 }
 
-pub fn list_all() -> Result<String, ServiceError> {
+/// list completed items
+pub fn list_completed() -> Result<String> {
+    let items = storage::get_all()?;
+
+    let completed: Vec<Item> = items
+        .into_iter()
+        .filter(|item| !item.is_deleted() && item.is_completed())
+        .collect();
+
+    if completed.is_empty() {
+        return  Ok("no completed items.".to_string());
+    }
+
+    let mut result = "completed Todo:\n\n".to_string();
+    for item in completed {
+        result += &format_item(&item);
+        result += "\n";
+    }
+    Ok(result)
+}
+
+/// list deleted items
+pub fn list_deleted() -> Result<String> {
+    let items = storage::get_all()?;
+
+    let deleted: Vec<Item> = items
+        .into_iter()
+        .filter(|item| item.is_deleted())
+        .collect();
+
+    if deleted.is_empty() {
+        return Ok("trash is empty.".to_string());
+    }
+
+    let mut result = "deleted Todo (Trash):\n\n".to_string();
+    for item in deleted {
+        result += &format_item(&item);
+        result += "\n";
+    }
+    Ok(result)
+}
+
+/// list all Todo
+pub fn list_all() -> Result<String> {
     let items = storage::get_all()?;
 
     if items.is_empty() {
         return Ok("no items.".to_string());
     }
 
-    let mut output = String::new();
-    output.push_str("All Todo:\n");
+    let mut result = "all Todo:\n\n".to_string();
+    for item in items {
+        result += &format_item(&item);
+        result += "\n";
+    }
+    Ok(result)
+}
 
-    for item in items.iter() {
-        let status: &str = if item.is_deleted() {
-            "🗑️ deleted"
-        } else if item.is_completed() {
-            "✅ completed"
-        } else {
-            "🔲 pending"
-        };
+/// format single Item
+fn format_item(item: &Item) -> String {
+    // 状态图标
+    let status_icon = if item.is_deleted() {
+        "🗑️"
+    } else if item.is_completed() {
+        "✅"
+    } else {
+        "🔲"
+    };
 
-        output.push_str(&format!("  [{}] {} - {}\n", item.id(), item.name(), status));
+    // 时间信息
+    let created = timestamp_to_datetime_string(item.created_at());
+    let completed = timestamp_to_datetime_string(item.completed_at());
+    let deleted = timestamp_to_datetime_string(item.deleted_at());
+    
+    let mut result = format!("{:3} {} {}\n", item.id(), status_icon, item.name());
+
+    if !created.is_empty() {
+        result += &format!("    Created: {}\n", created);
+    }
+    if !completed.is_empty() {
+        result += &format!("    Completed: {}\n", completed);
+    }
+    if !deleted.is_empty() {
+        result += &format!("    Deleted: {}\n", deleted);
     }
 
-    Ok(output)
+    result
 }
