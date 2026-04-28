@@ -1,5 +1,6 @@
 use crate::model::Item;
 use crate::model::ParseItemError;
+use std::fmt::write;
 use std::io::Read;
 use std::io::Write;
 use std::{env, fs::OpenOptions, path::Path};
@@ -21,7 +22,6 @@ impl std::fmt::Display for StorageError {
             StorageError::Io(e) => write!(f, "IO error: {}", e),
             StorageError::EnvVar(msg) => write!(f, "Enviroment variable error: {}", msg),
             StorageError::Parse(e) => write!(f, "parse error; {}", e),
-            StorageError::ItemNotFound(id) => write!(f, "item not found: {}", id),
         }
     }
 }
@@ -98,42 +98,5 @@ pub fn get_item_by_id(id: u32)  -> Result<Item, StorageError>{
         .iter()
         .find(|item| item.id() == id)
         .cloned()
-        .ok_or(StorageError::ItemNotFound(id))
+        .ok_or(Stor)
 }
-
-/// update item
-pub fn update_item(updated: Item) -> Result<(), StorageError> {
-    let items = get_all()?;
-    let path = get_csv_path()?;
-    let path = Path::new(&path);
-
-    let mut file = File::create(path)?;
-
-    for item in items {
-        if item.id() == updated.id() {
-            writeln!(file, "{}", updated.to_string())?;
-        } else {
-            writeln!(file, "{}", item.to_string())?;
-        }
-    }
-
-    Ok(())
-}
-
-// 物理删除指定 ID 的 Item
-// pub fn delete_item(id: u32) -> Result<(), StorageError> {
-//     let items = get_all()?;
-//     let path = get_csv_path()?;
-//     let path = Path::new(&path);
-
-//     // 重新写入，跳过被删除的 Item
-//     let mut file = File::create(path)?;
-
-//     for item in items {
-//         if item.id() != id {
-//             writeln!(file, "{}", item.to_string())?;
-//         }
-//     }
-
-//     Ok(())
-// }

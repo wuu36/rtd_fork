@@ -36,6 +36,24 @@ pub fn add_item(name: &str) -> Result<String> {
     Ok(format!("added [{}]: {}", item.id(), item.name()))
 }
 
+/// complete item
+pub fn complete_item(id: u32) -> Result<String> {
+    let item = storage::get_item_by_id(id)?;
+    let updated = item.with_completed(true);
+    storage::update_item(updated)?;
+
+    Ok(format!("complete [{}]: {}", id, item.name()))
+}
+
+/// cancel finished Todo
+pub fn uncomplete_item(id: u32) -> Result<String> {
+    let item = storage::get_item_by_id(id)?;
+    let updated = item.with_completed(false);
+    storage::update_item(updated)?;
+
+    Ok(format!("uncompleted [{}]: {}", id, item.name()))
+}
+
 /// list uncompleted items
 pub fn list_uncompleted() -> Result<String> {
     // let content = storage::read_all()?;
@@ -57,6 +75,24 @@ pub fn list_uncompleted() -> Result<String> {
         result += "\n";
     }
     Ok(result)
+}
+
+/// delete todo
+pub fn delete_item(id: u32) -> Result<String> {
+    let item = storage::get_item_by_id(id)?;
+    let updated = item.with_deleted(true);
+    storage::update_item(updated)?;
+
+    Ok(format!("deleted [{}]: {}", id, item.name()))
+}
+
+/// restore todo form trash
+pub fn restore_item(id: u32) -> Result<String> {
+    let item = storage::get_item_by_id(id)?;
+    let updated = item.with_deleted(false);
+    storage::update_item(updated)?;
+
+    Ok(format!("restore [{}]: {}", id, item.name()))
 }
 
 /// list completed items

@@ -5,6 +5,7 @@ use std::fmt::Display;
 use std::num::ParseIntError;
 use std::str::ParseBoolError;
 
+#[derive(Debug, Clone)]
 pub struct Item {
     id: u32,
     name: String,
@@ -83,6 +84,32 @@ impl Item {
 
     pub fn deleted_at(&self) -> Option<i64> {
         self.deleted_at
+    }
+
+    pub fn with_completed(&self, completed: bool) -> Self {
+        let completed_at = if completed {
+            Some(Local::now().timestamp())
+        } else {
+            None
+        };
+        Item {
+            completed,
+            completed_at,
+            ..self.clone()
+        }
+    }
+
+    pub fn with_deleted(&self, deleted: bool) -> Self {
+        let deleted_at = if deleted {
+            Some(Local::now().timestamp())
+        } else {
+            None
+        };
+        Item {
+            deleted,
+            deleted_at,
+            ..self.clone()
+        }
     }
 }
 
