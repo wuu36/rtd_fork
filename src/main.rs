@@ -1,5 +1,5 @@
 use clap::{Parser, ValueEnum};
-use rtd_fork::{add_item, clear, complete_item, delete_item, destory_deleted, destory_item, list_all, list_completed, list_deleted, list_uncompleted, restore_item, uncomplete_item};
+use rtd::{add_item, clear, complete_item, delete_item, destory_deleted, destory_item, list_all, list_completed, list_deleted, list_uncompleted, restore_item, uncomplete_item};
 
 #[derive(ValueEnum, Clone, Debug)]
 enum ListType {

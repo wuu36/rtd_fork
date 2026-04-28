@@ -1,5 +1,3 @@
-
-use crate::model::timestamp_to_datetime_string;
 use crate::{Item, storage::{self, StorageError}};
 
 type Result<T> = std::result::Result<T, ServiceError>;
@@ -71,7 +69,8 @@ pub fn list_uncompleted() -> Result<String> {
 
     let mut result = "Uncompleted Todo:\n\n".to_string();
     for item in uncompleted {
-        result += &format_item(&item);
+        // result += &format_item(&item);
+        result += &item.to_prettier_string();
         result += "\n";
     }
     Ok(result)
@@ -110,7 +109,8 @@ pub fn list_completed() -> Result<String> {
 
     let mut result = "completed Todo:\n\n".to_string();
     for item in completed {
-        result += &format_item(&item);
+        // result += &format_item(&item);
+        result += &item.to_prettier_string();
         result += "\n";
     }
     Ok(result)
@@ -131,7 +131,8 @@ pub fn list_deleted() -> Result<String> {
 
     let mut result = "deleted Todo (Trash):\n\n".to_string();
     for item in deleted {
-        result += &format_item(&item);
+        // result += &format_item(&item);
+        result += &item.to_prettier_string();
         result += "\n";
     }
     Ok(result)
@@ -173,7 +174,7 @@ pub fn clear() -> Result<String> {
     for item in items {
         storage::delete_item(item.id())?;
     }
-    
+
     Ok(format!("cleared {} items.", count))
 }
 
@@ -187,39 +188,40 @@ pub fn list_all() -> Result<String> {
 
     let mut result = "all Todo:\n\n".to_string();
     for item in items {
-        result += &format_item(&item);
+        // result += &format_item(&item);
+        result += &item.to_prettier_string();
         result += "\n";
     }
     Ok(result)
 }
 
-/// format single Item
-fn format_item(item: &Item) -> String {
-    // 状态图标
-    let status_icon = if item.is_deleted() {
-        "🗑️"
-    } else if item.is_completed() {
-        "✅"
-    } else {
-        "🔲"
-    };
+// format single Item
+// fn format_item(item: &Item) -> String {
+//     // 状态图标
+//     let status_icon = if item.is_deleted() {
+//         "🗑️"
+//     } else if item.is_completed() {
+//         "✅"
+//     } else {
+//         "🔲"
+//     };
 
-    // 时间信息
-    let created = timestamp_to_datetime_string(item.created_at());
-    let completed = timestamp_to_datetime_string(item.completed_at());
-    let deleted = timestamp_to_datetime_string(item.deleted_at());
+//     // 时间信息
+//     let created = timestamp_to_datetime_string(item.created_at());
+//     let completed = timestamp_to_datetime_string(item.completed_at());
+//     let deleted = timestamp_to_datetime_string(item.deleted_at());
     
-    let mut result = format!("{:3} {} {}\n", item.id(), status_icon, item.name());
+//     let mut result = format!("{:3} {} {}\n", item.id(), status_icon, item.name());
 
-    if !created.is_empty() {
-        result += &format!("    Created: {}\n", created);
-    }
-    if !completed.is_empty() {
-        result += &format!("    Completed: {}\n", completed);
-    }
-    if !deleted.is_empty() {
-        result += &format!("    Deleted: {}\n", deleted);
-    }
+//     if !created.is_empty() {
+//         result += &format!("    Created: {}\n", created);
+//     }
+//     if !completed.is_empty() {
+//         result += &format!("    Completed: {}\n", completed);
+//     }
+//     if !deleted.is_empty() {
+//         result += &format!("    Deleted: {}\n", deleted);
+//     }
 
-    result
-}
+//     result
+// }

@@ -111,7 +111,31 @@ impl Item {
             ..self.clone()
         }
     }
+
+    pub fn to_prettier_string(&self) -> String {
+        let created = timestamp_to_datetime_string(self.created_at);
+        let completed = timestamp_to_datetime_string(self.completed_at);
+        let deleted = timestamp_to_datetime_string(self.deleted_at);
+
+        let checkbox = if self.completed { "✅" } else { "🔲" };
+        let trash = if self.deleted { "🗑️" } else { "" };
+
+        let mut result = format!("[{}] {} {} {}\n", self.id, checkbox, trash, self.name);
+
+        if !created.is_empty() {
+            result += &format!("    Created: {}\n", created);
+        }
+        if !completed.is_empty() {
+            result += &format!("    Completed: {}\n", completed);
+        }
+        if !deleted.is_empty() {
+            result += &format!("    Deleted: {}\n", deleted);
+        }
+
+        result
+    }
 }
+
 
 /// Serialization
 impl ToString for Item {

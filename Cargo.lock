@@ -258,7 +258,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "rtd_fork"
+name = "rtd"
 version = "0.1.0"
 dependencies = [
  "chrono",
